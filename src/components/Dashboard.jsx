@@ -227,7 +227,7 @@ export default function Dashboard() {
   const [activeTab, setActiveTab] = useState('rooms');
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
-  // ATTENDANCE STATE (Persisted per date)
+  // Attendance Persistence State
   const [selectedSection, setSelectedSection] = useState('');
   const [selectedDate, setSelectedDate] = useState('2026-09-17');
   const [toDate, setToDate] = useState(timetablesData.semester.endDate);
@@ -236,7 +236,7 @@ export default function Dashboard() {
   const [results, setResults] = useState(null);
   const [saveNotification, setSaveNotification] = useState('');
 
-  // ROOM LOCATOR STATE
+  // Room Locator Filter State
   const [selectedFloor, setSelectedFloor] = useState("All");
   const [selectedDay, setSelectedDay] = useState("Monday");
   const [selectedPeriodIdx, setSelectedPeriodIdx] = useState(0);
@@ -245,11 +245,11 @@ export default function Dashboard() {
   const [aiSearching, setAiSearching] = useState(false);
   const [aiResponse, setAiResponse] = useState('');
 
-  // PHASE 2 STATE: INSPECTED ROOM & LIVE COUNTDOWN
+  // Phase 2 State: Live Countdown Timer & Inspection Modal
   const [inspectedRoom, setInspectedRoom] = useState(null);
   const [modalSelectedDay, setModalSelectedDay] = useState("Monday");
   const [modalSelectedPeriodIdx, setModalSelectedPeriodIdx] = useState(0);
-  const [countdown, setCountdown] = useState({ hours: 0, minutes: 0, seconds: 0 });
+  const [liveSecondsLeft, setLiveSecondsLeft] = useState(2700);
 
   const [toastMessage, setToastMessage] = useState('');
 
@@ -373,6 +373,40 @@ export default function Dashboard() {
     }
   }, []);
 
+  // Real-Time Countdown Ticker Hook
+  useEffect(() => {
+    const currentEndTimeStr = PERIOD_SLOTS[selectedPeriodIdx]?.endTime || "2:10 PM";
+
+    const updateCountdown = () => {
+      const now = new Date();
+      const [rawH, rawM] = currentEndTimeStr.replace(/[^0-9:]/g, '').split(':').map(Number);
+      let adjustedH = rawH;
+      if (currentEndTimeStr.toLowerCase().includes('pm') && adjustedH < 12) {
+        adjustedH += 12;
+      }
+
+      const target = new Date();
+      target.setHours(adjustedH, rawM || 0, 0, 0);
+
+      let diff = Math.floor((target.getTime() - now.getTime()) / 1000);
+      if (diff <= 0) {
+        diff = ((50 * 60) - (Math.floor(now.getTime() / 1000) % (50 * 60)));
+      }
+      setLiveSecondsLeft(diff);
+    };
+
+    updateCountdown();
+    const timer = setInterval(updateCountdown, 1000);
+    return () => clearInterval(timer);
+  }, [selectedPeriodIdx]);
+
+  const formattedCountdown = useMemo(() => {
+    const h = Math.floor(liveSecondsLeft / 3600);
+    const m = Math.floor((liveSecondsLeft % 3600) / 60);
+    const s = liveSecondsLeft % 60;
+    return `${String(h).padStart(2, '0')}h : ${String(m).padStart(2, '0')}m : ${String(s).padStart(2, '0')}s`;
+  }, [liveSecondsLeft]);
+
   const handleLogin = (e) => {
     e.preventDefault();
     const clean = inputRollNo.trim().toUpperCase();
@@ -486,7 +520,6 @@ export default function Dashboard() {
     showToast(`${roomId} marked as ${nextStatus ? 'FREE' : 'OCCUPIED'}`);
   };
 
-  // Live status calculation for permanent classrooms
   const computedRooms = useMemo(() => {
     return PERMANENT_ROOMS.map(room => {
       const scheduleDay = room.schedule[selectedDay] || [];
@@ -513,41 +546,6 @@ export default function Dashboard() {
 
   const freeCount = filteredRooms.filter(r => r.isFree).length;
 
-  // Real-Time Countdown Timer Hook for Phase 2
-  useEffect(() => {
-    if (!inspectedRoom) return;
-
-    const targetSlot = PERIOD_SLOTS[modalSelectedPeriodIdx] || PERIOD_SLOTS[selectedPeriodIdx];
-    const endTimeString = targetSlot?.endTime || "2:30 PM";
-
-    const tick = () => {
-      const now = new Date();
-      const [rawH, rawM] = endTimeString.replace(/[^0-9:]/g, '').split(':').map(Number);
-      let adjustedH = rawH;
-      if (endTimeString.toLowerCase().includes('pm') && adjustedH < 12) {
-        adjustedH += 12;
-      }
-
-      const target = new Date();
-      target.setHours(adjustedH, rawM || 0, 0, 0);
-
-      let diff = Math.floor((target.getTime() - now.getTime()) / 1000);
-      if (diff <= 0) {
-        // Dynamic demo fallback timer between period cycles
-        diff = ((45 * 60) - (Math.floor(now.getTime() / 1000) % (45 * 60)));
-      }
-
-      const h = Math.floor(diff / 3600);
-      const m = Math.floor((diff % 3600) / 60);
-      const s = diff % 60;
-      setCountdown({ hours: h, minutes: m, seconds: s });
-    };
-
-    tick();
-    const timer = setInterval(tick, 1000);
-    return () => clearInterval(timer);
-  }, [inspectedRoom, modalSelectedPeriodIdx, selectedPeriodIdx]);
-
   const inspectedSlotStatus = useMemo(() => {
     if (!inspectedRoom) return null;
     const scheduleDay = inspectedRoom.schedule[modalSelectedDay] || [];
@@ -560,16 +558,16 @@ export default function Dashboard() {
     };
   }, [inspectedRoom, modalSelectedDay, modalSelectedPeriodIdx]);
 
-  // Phase 2: Call the Squad WhatsApp Integration
+  // Phase 2: Call the Squad (Direct WhatsApp integration)
   const handleCallSquad = (room) => {
     const slot = PERIOD_SLOTS[modalSelectedPeriodIdx] || PERIOD_SLOTS[selectedPeriodIdx];
-    const untilTime = slot?.endTime || "2:30 PM";
+    const untilTime = slot?.endTime || "2:10 PM";
     const shareText = `📍 Heading to ${room.roomId}. It's free until ${untilTime}. Come fast!`;
     const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(shareText)}`;
     window.open(whatsappUrl, '_blank');
   };
 
-  // AI Smart Room Finder execution (REST fetch)
+  // AI Smart Room Finder with Dual Authentication + Correct Model Route
   const handleAISearch = async (queryText) => {
     const query = queryText || aiPrompt;
     if (!query.trim() || aiSearching) return;
@@ -592,19 +590,31 @@ TASK:
 3. If floor is mentioned, prioritize that floor. Output structured bullet points.
 `;
 
+      const cleanKey = apiKey.trim();
       const res = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${apiKey.trim()}`,
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${cleanKey}`,
         {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            'x-goog-api-key': cleanKey
+          },
           body: JSON.stringify({
-            contents: [{ parts: [{ text: `${systemPrompt}\n\nQuery: "${query}"` }] }]
+            contents: [
+              {
+                parts: [
+                  { text: `${systemPrompt}\n\nQuery: "${query}"` }
+                ]
+              }
+            ]
           })
         }
       );
 
       const data = await res.json();
-      if (data.error) throw new Error(data.error.message);
+      if (data.error) {
+        throw new Error(data.error.message || JSON.stringify(data.error));
+      }
 
       const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || "No free classrooms match that criteria.";
       setAiResponse(reply);
@@ -674,7 +684,7 @@ TASK:
       />
 
       <main className="flex-1 p-6 lg:p-10 overflow-y-auto max-w-7xl">
-        {/* Header */}
+        {/* Top Header */}
         <div className="flex flex-wrap justify-between items-center mb-6 gap-4">
           <div>
             <h1 className="text-3xl lg:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-slate-100 via-slate-200 to-slate-400 uppercase tracking-tight">
@@ -706,7 +716,7 @@ TASK:
           </div>
         </div>
 
-        {/* Glossy Transparent Navigation Tabs */}
+        {/* Transparent Glassmorphism Navigation Tabs */}
         <div className="flex flex-wrap gap-3 mb-8">
           {[
             { id: 'rooms', label: '3D Floor Map & Free Class', icon: '🏢' },
@@ -728,7 +738,7 @@ TASK:
           ))}
         </div>
 
-        {/* TAB 1: 3D MAP & COUNTDOWN & SQUAD SHARE */}
+        {/* TAB 1: 3D MAP, COUNTDOWN & SQUAD SHARE */}
         {activeTab === 'rooms' && (
           <div className="space-y-8 animate-[fadeIn_0.3s_ease-out]">
             {/* Global Day & Period Picker */}
@@ -767,19 +777,29 @@ TASK:
                 </div>
               </div>
 
-              <div className="flex items-center gap-3">
-                <span className="text-xs text-slate-400">
-                  Floor Vacancy: <strong className="text-emerald-400 text-sm font-black">{freeCount} Free</strong> / {filteredRooms.length} Rooms
-                </span>
+              {/* LIVE ACTIVE PERIOD COUNTDOWN TICKER BADGE */}
+              <div className="flex items-center gap-4">
+                <div className="p-3 px-4 rounded-2xl bg-white/[0.04] border border-white/15 backdrop-blur-xl flex items-center space-x-3">
+                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping" />
+                  <div>
+                    <span className="text-[9px] uppercase tracking-widest text-slate-400 block font-bold">
+                      Current Slot Countdown:
+                    </span>
+                    <span className="text-sm font-black font-mono text-emerald-300">
+                      {formattedCountdown}
+                    </span>
+                  </div>
+                </div>
+
                 <button
                   onClick={() => {
                     localStorage.removeItem('vibecraft_floor_overrides_v2');
                     setRoomOverrides({});
                     showToast('All room statuses reset to timetable baseline');
                   }}
-                  className="text-[11px] text-slate-300 hover:text-white border border-white/15 hover:border-white/30 bg-white/[0.04] hover:bg-white/[0.09] px-3.5 py-1.5 rounded-2xl backdrop-blur-xl transition-all cursor-pointer"
+                  className="text-[11px] text-slate-300 hover:text-white border border-white/15 hover:border-white/30 bg-white/[0.04] hover:bg-white/[0.09] px-3.5 py-2.5 rounded-2xl backdrop-blur-xl transition-all cursor-pointer"
                 >
-                  Reset Overrides
+                  Reset
                 </button>
               </div>
             </div>
@@ -895,7 +915,7 @@ TASK:
                     3D Architectural Building Model — {selectedFloor !== "All" ? `Floor ${selectedFloor}` : "All Floors"}
                   </h3>
                   <p className="text-[11px] text-slate-400 mt-0.5">
-                    Interactive isometric model. Rooms dynamically shift color based on timetable occupancy.
+                    Isometric campus view. Click any room block to inspect countdown & Call the Squad.
                   </p>
                 </div>
                 <div className="flex items-center gap-4 text-xs">
@@ -954,13 +974,13 @@ TASK:
             <div className="space-y-4">
               <div className="flex justify-between items-center border-b border-white/10 pb-3">
                 <h3 className="text-lg font-bold text-slate-100 flex items-center gap-2">
-                  <span>Classroom Details & Manual Control</span>
+                  <span>Classrooms on Floor {selectedFloor}</span>
                   <span className="text-xs font-mono text-slate-300 bg-white/[0.06] border border-white/15 px-2 py-0.5 rounded-full">
                     {filteredRooms.length} Rooms
                   </span>
                 </h3>
                 <span className="text-xs text-slate-400">
-                  Click any classroom box to inspect its countdown & invite the squad.
+                  Tap "Call the Squad" or click card to inspect live countdown timer.
                 </span>
               </div>
 
@@ -1007,11 +1027,17 @@ TASK:
                         <strong className="text-slate-200">{room.assignedSection}</strong>
                       </div>
 
-                      <div className="text-xs mb-3">
+                      {/* LIVE COUNTDOWN ON CARD (Phase 2 Feature) */}
+                      <div className="text-xs mb-3 space-y-1">
                         {room.isFree ? (
-                          <span className="text-emerald-300 font-semibold flex items-center gap-1.5">
-                            ✓ Currently Empty & Available
-                          </span>
+                          <div>
+                            <span className="text-emerald-300 font-semibold flex items-center gap-1.5">
+                              ✓ Available Right Now
+                            </span>
+                            <span className="text-[11px] font-mono text-slate-400 block mt-1">
+                              ⏳ Time Left: <strong className="text-emerald-300 font-bold">{formattedCountdown}</strong>
+                            </span>
+                          </div>
                         ) : (
                           <div className="text-rose-300 truncate">
                             <span className="font-bold text-rose-200">Class: {room.currentSubject}</span>
@@ -1022,20 +1048,31 @@ TASK:
                     </div>
 
                     <div className="space-y-2 pt-3 border-t border-white/10">
+                      {/* CALL THE SQUAD BUTTON (Phase 2 Feature) */}
                       <button
                         type="button"
-                        onClick={() => {
-                          setInspectedRoom(room);
-                          setModalSelectedDay(selectedDay);
-                          setModalSelectedPeriodIdx(selectedPeriodIdx);
-                        }}
-                        className="w-full py-2.5 px-3 rounded-2xl bg-white/[0.05] hover:bg-white/[0.12] active:scale-95 border border-white/20 hover:border-white/35 backdrop-blur-2xl transition-all duration-300 text-slate-200 hover:text-white font-bold text-xs uppercase tracking-wider cursor-pointer flex items-center justify-center space-x-1.5 shadow-[inset_0_1px_1px_rgba(255,255,255,0.15)]"
+                        onClick={() => handleCallSquad(room)}
+                        className="w-full py-2.5 px-3 rounded-2xl bg-emerald-500/15 hover:bg-emerald-500/25 active:scale-95 border border-emerald-500/35 hover:border-emerald-400/50 backdrop-blur-2xl transition-all duration-300 text-emerald-200 hover:text-white font-bold text-xs uppercase tracking-wider cursor-pointer flex items-center justify-center space-x-2 shadow-[0_0_15px_rgba(16,185,129,0.2)]"
                       >
-                        <span>⏳</span>
-                        <span>Inspect Countdown & Squad</span>
+                        <svg className="w-3.5 h-3.5 fill-current text-emerald-400" viewBox="0 0 24 24">
+                          <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
+                        </svg>
+                        <span>Call the Squad</span>
                       </button>
 
                       <div className="flex gap-2">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setInspectedRoom(room);
+                            setModalSelectedDay(selectedDay);
+                            setModalSelectedPeriodIdx(selectedPeriodIdx);
+                          }}
+                          className="flex-1 py-1.5 px-2 rounded-xl text-[10px] font-bold uppercase tracking-wider backdrop-blur-xl transition-all border border-white/10 hover:border-white/25 text-slate-300 hover:text-white cursor-pointer"
+                        >
+                          Inspect Room
+                        </button>
+
                         <button
                           type="button"
                           onClick={() => toggleRoomStatus(room.roomId, room.isFree)}
@@ -1045,16 +1082,7 @@ TASK:
                               : 'bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 border-emerald-500/25'
                           }`}
                         >
-                          {room.isFree ? "Mark Occupied" : "Mark Free"}
-                        </button>
-
-                        <button
-                          type="button"
-                          onClick={() => handleCallSquad(room)}
-                          title="Call the Squad on WhatsApp"
-                          className="px-3 py-1.5 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 text-xs font-bold backdrop-blur-xl transition-all cursor-pointer flex items-center justify-center"
-                        >
-                          <span>💬 Squad</span>
+                          {room.isFree ? "Mark Busy" : "Mark Free"}
                         </button>
                       </div>
                     </div>
@@ -1189,7 +1217,7 @@ TASK:
           </div>
         )}
 
-        {/* FEATURE 1 & 2: LIVE COUNTDOWN TIMER & CALL THE SQUAD MODAL */}
+        {/* 5-DAY & 8-HOUR POP-UP INSPECTOR */}
         {inspectedRoom && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-[fadeIn_0.2s_ease-out]">
             <div className="glass-card max-w-2xl w-full p-6 sm:p-8 border border-white/20 relative shadow-[0_0_50px_rgba(0,0,0,0.8)] backdrop-blur-3xl">
@@ -1230,24 +1258,16 @@ TASK:
                   ⏳ Live Countdown Until Next Class Begins
                 </span>
                 <div className="flex items-center justify-center gap-2 text-3xl font-black font-mono text-white tracking-wider">
-                  <span className="bg-black/60 px-3 py-1.5 rounded-xl border border-white/10">
-                    {String(countdown.hours).padStart(2, '0')}h
-                  </span>
-                  <span className="text-slate-400 animate-pulse">:</span>
-                  <span className="bg-black/60 px-3 py-1.5 rounded-xl border border-white/10">
-                    {String(countdown.minutes).padStart(2, '0')}m
-                  </span>
-                  <span className="text-slate-400 animate-pulse">:</span>
                   <span className="bg-black/60 px-3 py-1.5 rounded-xl border border-white/10 text-emerald-400">
-                    {String(countdown.seconds).padStart(2, '0')}s
+                    {formattedCountdown}
                   </span>
                 </div>
                 <p className="text-[11px] text-slate-400 mt-2">
-                  Period concludes at <strong className="text-slate-200">{PERIOD_SLOTS[modalSelectedPeriodIdx]?.endTime || "2:30 PM"}</strong>.
+                  Period concludes at <strong className="text-slate-200">{PERIOD_SLOTS[modalSelectedPeriodIdx]?.endTime || "2:10 PM"}</strong>.
                 </p>
               </div>
 
-              {/* Day Selector */}
+              {/* Day Selector (5 Days) */}
               <div className="mb-5">
                 <label className="block text-[11px] uppercase tracking-widest font-extrabold text-slate-400 mb-2">
                   1. Choose Day:
@@ -1270,7 +1290,7 @@ TASK:
                 </div>
               </div>
 
-              {/* Hour Timings Selector */}
+              {/* 8 Hour Timings Selector */}
               <div className="mb-6">
                 <label className="block text-[11px] uppercase tracking-widest font-extrabold text-slate-400 mb-2">
                   2. Choose Hour Timing:
@@ -1318,17 +1338,17 @@ TASK:
                 </div>
               )}
 
-              {/* CALL THE SQUAD BUTTON (AUTOMATIC PRE-FILLED WHATSAPP MESSAGE) */}
+              {/* CALL THE SQUAD BUTTON */}
               <div className="flex gap-3">
                 <button
                   type="button"
                   onClick={() => handleCallSquad(inspectedRoom)}
-                  className="flex-1 py-3.5 px-4 rounded-2xl bg-emerald-500/20 hover:bg-emerald-500/30 active:scale-95 border border-emerald-500/40 text-emerald-200 hover:text-emerald-100 font-bold text-xs uppercase tracking-wider backdrop-blur-2xl transition-all cursor-pointer flex items-center justify-center space-x-2 shadow-[0_0_20px_rgba(16,185,129,0.3)]"
+                  className="flex-1 py-3.5 px-4 rounded-2xl bg-emerald-500/15 hover:bg-emerald-500/25 active:scale-95 border border-emerald-500/35 hover:border-emerald-400/50 text-emerald-200 hover:text-white font-bold text-xs uppercase tracking-wider backdrop-blur-2xl transition-all cursor-pointer flex items-center justify-center space-x-2 shadow-[0_0_20px_rgba(16,185,129,0.3)]"
                 >
                   <svg className="w-4 h-4 fill-current text-emerald-400" viewBox="0 0 24 24">
                     <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
                   </svg>
-                  <span>📍 Call the Squad (WhatsApp)</span>
+                  <span>📍 Call the Squad</span>
                 </button>
 
                 <button
