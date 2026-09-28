@@ -1,0 +1,23 @@
+@import "tailwindcss";
+
+@layer base {
+/* ...rest of code */
+  body {
+    @apply bg-[#030014] text-slate-200 min-h-screen font-sans antialiased selection:bg-purple-500/30 m-0 p-0;
+    background-image: 
+      radial-gradient(circle at 15% 0%, #2e1065 0%, transparent 45%),
+      radial-gradient(circle at 85% 95%, #1e1b4b 0%, transparent 45%),
+      radial-gradient(circle at 50% 50%, #020617 0%, #030014 100%);
+    background-attachment: fixed;
+  }
+}
+
+@layer utilities {
+  .glass-card {
+    @apply bg-white/[0.02] backdrop-blur-2xl border border-white/10 shadow-[0_8px_32px_0_rgba(31,38,135,0.37)] rounded-2xl overflow-hidden;
+  }
+  
+  .glass-input {
+    @apply bg-black/20 backdrop-blur-md border border-white/10 text-slate-100 placeholder-slate-500 outline-none transition-all duration-300 focus:border-purple-500/50 focus:bg-white/[0.05] focus:shadow-[0_0_15px_rgba(168,85,247,0.15)];
+  }
+}   

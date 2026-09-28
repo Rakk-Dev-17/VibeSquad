@@ -1,0 +1,403 @@
+{
+  "semester": {
+    "startDate": "2026-08-29",
+    "endDate": "2026-11-29",
+    "holidays": [
+      "2026-10-02",
+      "2026-10-31"
+    ]
+  },
+  "sections": [
+    {
+      "sectionId": "I-year-Time-Table-SEEE",
+      "schedule": {
+        "Monday": [
+          "Philosophy of Engineering",
+          "Philosophy of Engineering",
+          "Chemistry",
+          "Advanced Calculus and Complex Analysis",
+          "Biology",
+          "Philosophy of Engineering",
+          "Philosophy of Engineering",
+          "Analysis Chemistry",
+          "Advanced Calculus and Complex",
+          "Philosophy of Engineering",
+          "Philosophy of Engineering",
+          "Chemistry",
+          "Advanced Calculusand Complex Analysis",
+          "Cell biology (for Biotech)",
+          "Philosophy of Engineering",
+          "Philosophy of Engineering",
+          "Advanced Calculus and Complex Analysis",
+          "Chemistry'"
+        ],
+        "Tuesday": [
+          "Chemistry",
+          "Advanced Calculus and Complex Analysis",
+          "Programming for Problem Solving",
+          "Analysis Chemistry",
+          "Advanced Calculus and Complex",
+          "Programming for Problem Solving",
+          "Chemistry",
+          "Advanced Calculusand Complex Analysis",
+          "Programming for Problem Solving",
+          "Cell biology (for Biotech)",
+          "Biochemistry (for Biotech)",
+          "Chemistry'",
+          "Advanced Calculus and Complex Analysis",
+          "Programming for Problem Solving"
+        ],
+        "Wednesday": [
+          "Chemistry",
+          "Philosophy of Engineering",
+          "Programming for Problem Solving",
+          "Electronic System and PCB Design (for ECE)",
+          "Analysis Chemistry",
+          "Philosophy of Engineering",
+          "Programming for Problem Solving",
+          "Advanced Calculusand Complex Analysis",
+          "Chemistry",
+          "Philosophy of Engineering",
+          "Programming for Problem Solving",
+          "Programming for Problem Solving",
+          "Chemistry'",
+          "Philosophy of Engineering",
+          "Programming for Problem Solving"
+        ],
+        "Thursday": [
+          "Advanced Calculus and Complex Analysis",
+          "Advanced Calculus and Complex",
+          "Programming for Problem Solving",
+          "Advanced Calculusand Complex Analysis",
+          "Programming for Problem Solving",
+          "Electronic System and PCB Design",
+          "Chemistry",
+          "Advanced Calculus and Complex Analysis",
+          "Chemistry'"
+        ],
+        "Friday": [
+          "Programming for Problem Solving",
+          "Advanced Calculus and Complex Analysis",
+          "Electronic System and PCB Design",
+          "Chemistry",
+          "Biology",
+          "Analysis Chemistry",
+          "Advanced Calculus and Complex",
+          "Chemistry",
+          "Biochemistry (for Biotech)",
+          "Advanced Calculus and Complex Analysis"
+        ]
+      }
+    },
+    {
+      "sectionId": "II-BME",
+      "schedule": {
+        "Monday": [
+          "Medical Physics",
+          "Electric and Electronic Circuits",
+          "Social Engineering"
+        ],
+        "Tuesday": [
+          "Electric and Electronic Circuits",
+          "Medical Physics",
+          "Biomedical Signals and Systems",
+          "Transforms and Boundary Value Problems"
+        ],
+        "Wednesday": [
+          "Biomedical Signals and Systems",
+          "Digital Logic for Medical Systems",
+          "Transforms and Boundary Value Problems"
+        ],
+        "Thursday": [
+          "Transforms and Boundary Value Problems",
+          "Medical Physics",
+          "Biomedical Signals and Systems",
+          "Digital Logic for Medical Systems"
+        ],
+        "Friday": [
+          "Professional Ethics",
+          "Transforms and Boundary Value Problems",
+          "Electric and Electronic Circuits",
+          "Digital Logic for Medical Systems",
+          "Social Engineering"
+        ]
+      }
+    },
+    {
+      "sectionId": "II-E-DS-A",
+      "schedule": {
+        "Monday": [
+          "Electromagnetic Theory and Interference",
+          "Transforms and Boundary Value Problems"
+        ],
+        "Tuesday": [
+          "Computer Organization and Architecture",
+          "Transforms and Boundary Value Problems",
+          "Electromagnetic Theory and Interference",
+          "Digital Logic Design"
+        ],
+        "Wednesday": [
+          "Transforms and Boundary Value Problems",
+          "Solid State Devices",
+          "Computer Organization and Architecture",
+          "Digital Logic Design"
+        ],
+        "Thursday": [
+          "Solid State Devices",
+          "Computer Organization and Architecture",
+          "Transforms and Boundary Value Problems",
+          "Professional Ethics"
+        ],
+        "Friday": [
+          "Digital Logic Design",
+          "Solid State Devices",
+          "Electromagnetic Theory and Interference",
+          "Computer Organization and Architecture",
+          "Transforms and Boundary Value Problems"
+        ]
+      }
+    },
+    {
+      "sectionId": "II-ECE-DS-B",
+      "schedule": {
+        "Monday": [
+          "Digital Logic Design",
+          "Digital Logic Design",
+          "Solid State Devices",
+          "Computer Organization and Architecture"
+        ],
+        "Tuesday": [
+          "Computer Organization and Architecture",
+          "Digital Logic Design",
+          "Electromagnetic Theory and Interference",
+          "Value Problems"
+        ],
+        "Wednesday": [
+          "Electromagnetic Theory and Interference",
+          "Value Problems",
+          "Digital Logic Design"
+        ],
+        "Thursday": [
+          "Value Problems",
+          "Computer Organization and Architecture",
+          "Solid State Devices",
+          "Electromagnetic Theory and Interference"
+        ],
+        "Friday": [
+          "Value Problems",
+          "Professional Ethics",
+          "Value Problems",
+          "Solid State Devices",
+          "Computer Organization and Architecture"
+        ]
+      }
+    },
+    {
+      "sectionId": "III-BME",
+      "schedule": {
+        "Monday": [
+          "Modern wireless communication system",
+          "Microcontrollers and Its Application in Medicine",
+          "Principles of Medical Imaging",
+          "Indian Art Form"
+        ],
+        "Tuesday": [
+          "Biomedical Signal Processing",
+          "Biometrics",
+          "Probability and Statistics",
+          "Microcontrollers and Its Application in Medicine"
+        ],
+        "Wednesday": [
+          "Probability and Statistics",
+          "Principles of Medical Imaging",
+          "Biometrics"
+        ],
+        "Thursday": [
+          "Probability and Statistics",
+          "Biomedical Signal Processing",
+          "Modern wireless communication system",
+          "Microcontrollers and Its Application in Medicine"
+        ],
+        "Friday": [
+          "Probability and Statistics",
+          "Principles of Medical Imaging",
+          "Probability and Statistics",
+          "Biometrics",
+          "Modern wireless communication system"
+        ]
+      }
+    },
+    {
+      "sectionId": "III-ECE-A",
+      "schedule": {
+        "Monday": [
+          "Machine learning for all",
+          "Microprocessor,Microcontroller, and Interfacing Techniques",
+          "Microprocessor,Microcontroller, and Interfacing Techniques",
+          "Discrete Mathematics"
+        ],
+        "Tuesday": [
+          "Indian Art Form",
+          "System and Network on Chip",
+          "Microprocessor,Microcontroller, and Interfacing Techniques"
+        ],
+        "Wednesday": [
+          "VLSI Design and Technology",
+          "Discrete Mathematics",
+          "System and Network on Chip",
+          "Community connect"
+        ],
+        "Thursday": [
+          "Discrete Mathematics",
+          "Machine learning for all",
+          "VLSI Design and Technology",
+          "Community connect"
+        ],
+        "Friday": [
+          "System and Network on Chip",
+          "Discrete Mathematics",
+          "Machine learning for all",
+          "VLSI Design and Technology",
+          "Discrete Mathematics"
+        ]
+      }
+    },
+    {
+      "sectionId": "III-ECE-B",
+      "schedule": {
+        "Monday": [
+          "Machine learning for all",
+          "Microprocessor,Microcontroller, and Interfacing Techniques",
+          "Discrete Mathematics",
+          "System and Network on Chip"
+        ],
+        "Tuesday": [
+          "Community connect",
+          "Microprocessor,Microcontroller, and Interfacing Techniques",
+          "System and Network on Chip",
+          "VLSI Design and Technology"
+        ],
+        "Wednesday": [
+          "Microprocessor,Microcontroller, and Interfacing Techniques",
+          "Discrete Mathematics",
+          "Indian Art Form"
+        ],
+        "Thursday": [
+          "Discrete Mathematics",
+          "VLSI Design and Technology",
+          "Machine learning for all",
+          "Community connect"
+        ],
+        "Friday": [
+          "Discrete Mathematics",
+          "Discrete Mathematics",
+          "Machine learning for all",
+          "System and Network on Chip"
+        ]
+      }
+    },
+    {
+      "sectionId": "III-ECE-DS",
+      "schedule": {
+        "Monday": [
+          "Database Design and Management",
+          "Microprocessor,Microcontroller and Interfacing Techniques",
+          "VLSI Design and Technology",
+          "Discrete Mathematics"
+        ],
+        "Tuesday": [
+          "VLSI Design and Technology",
+          "Microprocessor,Microcontroller and Interfacing Techniques",
+          "Machine learning for all",
+          "Community connect"
+        ],
+        "Wednesday": [
+          "Indian Art Form",
+          "Microprocessor,Microcontroller and Interfacing Techniques",
+          "VLSI Design and Technology"
+        ],
+        "Thursday": [
+          "Discrete Mathematics",
+          "Machine learning for all",
+          "Database Design and Management",
+          "Community connect"
+        ],
+        "Friday": [
+          "Machine learning for all",
+          "Discrete Mathematics",
+          "Database Design and Management",
+          "Discrete Mathematics"
+        ]
+      }
+    },
+    {
+      "sectionId": "IV-ECE-A",
+      "schedule": {
+        "Monday": [
+          "Computer Communication and Network Security",
+          "Behavioural Psychology",
+          "Semiconductor Memory Design"
+        ],
+        "Tuesday": [
+          "Computer Communication and Network Security",
+          "Semiconductor Memory Design",
+          "Wireless Communication and Antenna Systems",
+          "Machine learning for all"
+        ],
+        "Wednesday": [
+          "Wireless Communication and Antenna Systems",
+          "Scripting Language for Electronic Design Automation",
+          "Machine learning for all"
+        ],
+        "Thursday": [
+          "Machine learning for all",
+          "Behavioural Psychology",
+          "Scripting Language for Electronic Design Automation",
+          "Wireless Communication and Antenna Systems"
+        ],
+        "Friday": [
+          "Computer Communication and Network Security",
+          "Behavioural Psychology",
+          "Semiconductor Memory Design",
+          "Scripting Language for Electronic Design Automation",
+          "Wireless Communication and Antenna Systems",
+          "Semiconductor Memory Design"
+        ]
+      }
+    },
+    {
+      "sectionId": "IV-ECE-B",
+      "schedule": {
+        "Monday": [
+          "Computer Communication and Network Security",
+          "Behavioural Psychology",
+          "Scripting Language for Electronic Design Automation",
+          "Machine learning for all"
+        ],
+        "Tuesday": [
+          "Computer Communication and Network Security",
+          "Scripting Language for Electronic Design Automation",
+          "Machine learning for all",
+          "Wireless Communication and Antenna Systems"
+        ],
+        "Wednesday": [
+          "Computer Communication and Network Security",
+          "Semiconductor Memory Design",
+          "Behavioural Psychology",
+          "Wireless Communication and Antenna Systems"
+        ],
+        "Thursday": [
+          "Semiconductor Memory Design",
+          "Wireless Communication and Antenna Systems",
+          "Behavioural Psychology"
+        ],
+        "Friday": [
+          "Scripting Language for Electronic Design Automation",
+          "Semiconductor Memory Design",
+          "Machine learning for all",
+          "Machine learning for all"
+        ]
+      }
+    }
+  ]
+}
