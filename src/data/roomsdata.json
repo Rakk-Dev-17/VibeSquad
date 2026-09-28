@@ -1,0 +1,13 @@
+[
+  { "roomId": "G-01", "name": "Room G-01", "floor": "Ground Floor", "floorNum": 0, "capacity": 65, "isAC": true, "hasProjector": true, "sectionId": "III-BME" },
+  { "roomId": "G-02", "name": "Room G-02 (Seminar Hall)", "floor": "Ground Floor", "floorNum": 0, "capacity": 120, "isAC": true, "hasProjector": true, "sectionId": null },
+  { "roomId": "101", "name": "Room 101", "floor": "1st Floor", "floorNum": 1, "capacity": 60, "isAC": false, "hasProjector": true, "sectionId": "III-ECE-A" },
+  { "roomId": "102", "name": "Room 102", "floor": "1st Floor", "floorNum": 1, "capacity": 60, "isAC": true, "hasProjector": true, "sectionId": "III-ECE-B" },
+  { "roomId": "103", "name": "Room 103 (IoT Lab)", "floor": "1st Floor", "floorNum": 1, "capacity": 45, "isAC": true, "hasProjector": false, "sectionId": "III-EEE" },
+  { "roomId": "201", "name": "Room 201", "floor": "2nd Floor", "floorNum": 2, "capacity": 60, "isAC": false, "hasProjector": true, "sectionId": "III-CSE-A" },
+  { "roomId": "202", "name": "Room 202", "floor": "2nd Floor", "floorNum": 2, "capacity": 65, "isAC": true, "hasProjector": true, "sectionId": "III-CSE-B" },
+  { "roomId": "203", "name": "Room 203 (AI Studio)", "floor": "2nd Floor", "floorNum": 2, "capacity": 50, "isAC": true, "hasProjector": true, "sectionId": "III-AIDS" },
+  { "roomId": "301", "name": "Room 301", "floor": "3rd Floor", "floorNum": 3, "capacity": 60, "isAC": false, "hasProjector": false, "sectionId": "III-MECH" },
+  { "roomId": "302", "name": "Room 302", "floor": "3rd Floor", "floorNum": 3, "capacity": 60, "isAC": false, "hasProjector": true, "sectionId": "III-CIVIL" },
+  { "roomId": "303", "name": "Room 303 (Open Project Lab)", "floor": "3rd Floor", "floorNum": 3, "capacity": 40, "isAC": true, "hasProjector": true, "sectionId": null }
+]
