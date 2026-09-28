@@ -28,12 +28,27 @@ export default function FloatingAIChat({ currentUser, selectedSection, results }
     setLoading(true);
 
     try {
-      const apiKey = import.meta.env.VITE_GEMINI_API_KEY || "AQ.Ab8RN6LDb7yyZM3gKCTncOZAM2HedcdWF_VY_BLAZ2cOdU_i5A";
-      if (!apiKey) {
-        throw new Error("Missing VITE_GEMINI_API_KEY in .env");
+      const rawKey = (import.meta.env.VITE_GEMINI_API_KEY || "").trim();
+      if (!rawKey) {
+        throw new Error("Missing VITE_GEMINI_API_KEY in environment or .env");
       }
 
-      const cleanKey = apiKey.trim();
+      const isBearerToken = rawKey.startsWith("AQ.");
+
+      // Formulate target endpoint and headers based on token type
+      const url = isBearerToken
+        ? `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent`
+        : `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${rawKey}`;
+
+      const headers = {
+        'Content-Type': 'application/json'
+      };
+
+      if (isBearerToken) {
+        headers['Authorization'] = `Bearer ${rawKey}`;
+      } else {
+        headers['x-goog-api-key'] = rawKey;
+      }
 
       const systemPrompt = `
 You are the AI Attendance Strategist for a college student inside the VibeCraft Attendance Portal.
@@ -57,29 +72,21 @@ YOUR INSTRUCTIONS:
 4. Keep replies clear, structured with short bullet points, actionable, and mathematically exact. No fluff.
 `;
 
-      // Direct REST fetch using gemini-3.8-flash and x-goog-api-key header
-      const res = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${cleanKey}`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'x-goog-api-key': cleanKey
-          },
-          body: JSON.stringify({
-            contents: [
-              {
-                parts: [
-                  { text: `${systemPrompt}\n\nStudent Question: ${userMessage}` }
-                ]
-              }
-            ]
-          })
-        }
-      );
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: headers,
+        body: JSON.stringify({
+          contents: [
+            {
+              parts: [
+                { text: `${systemPrompt}\n\nStudent Question: ${userMessage}` }
+              ]
+            }
+          ]
+        })
+      });
 
       const data = await res.json();
-
       if (data.error) {
         throw new Error(data.error.message || JSON.stringify(data.error));
       }
