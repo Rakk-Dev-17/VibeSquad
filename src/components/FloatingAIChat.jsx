@@ -28,7 +28,7 @@ export default function FloatingAIChat({ currentUser, selectedSection, results }
     setLoading(true);
 
     try {
-      const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+      const apiKey = import.meta.env.VITE_GEMINI_API_KEY || "AQ.Ab8RN6LDb7yyZM3gKCTncOZAM2HedcdWF_VY_BLAZ2cOdU_i5A";
       if (!apiKey) {
         throw new Error("Missing VITE_GEMINI_API_KEY in .env");
       }
