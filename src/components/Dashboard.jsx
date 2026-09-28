@@ -223,7 +223,7 @@ export default function Dashboard() {
   const [inputRollNo, setInputRollNo] = useState('');
   const [currentUser, setCurrentUser] = useState(null);
   
-  // Tabs: 'rooms' | 'attendance' | 'analytics'
+  // Dashboard Tabs: 'rooms' | 'attendance' | 'analytics'
   const [activeTab, setActiveTab] = useState('rooms');
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
@@ -245,7 +245,7 @@ export default function Dashboard() {
   const [aiSearching, setAiSearching] = useState(false);
   const [aiResponse, setAiResponse] = useState('');
 
-  // Phase 2 State: Live Countdown Timer & Inspection Modal
+  // Phase 2: Live Room Countdown Timer State
   const [inspectedRoom, setInspectedRoom] = useState(null);
   const [modalSelectedDay, setModalSelectedDay] = useState("Monday");
   const [modalSelectedPeriodIdx, setModalSelectedPeriodIdx] = useState(0);
@@ -373,7 +373,7 @@ export default function Dashboard() {
     }
   }, []);
 
-  // Real-Time Countdown Ticker Hook
+  // Real-Time Countdown Ticker
   useEffect(() => {
     const currentEndTimeStr = PERIOD_SLOTS[selectedPeriodIdx]?.endTime || "2:10 PM";
 
@@ -567,7 +567,7 @@ export default function Dashboard() {
     window.open(whatsappUrl, '_blank');
   };
 
-  // AI Smart Room Finder with Dual Authentication + Correct Model Route
+  // AI Smart Room Finder with Universal Dual-Authentication
   const handleAISearch = async (queryText) => {
     const query = queryText || aiPrompt;
     if (!query.trim() || aiSearching) return;
@@ -576,9 +576,27 @@ export default function Dashboard() {
     setAiResponse('');
 
     try {
-      const apiKey = import.meta.env.VITE_GEMINI_API_KEY || "AQ.Ab8RN6LDb7yyZM3gKCTncOZAM2HedcdWF_VY_BLAZ2cOdU_i5A";
+      const rawKey = (import.meta.env.VITE_GEMINI_API_KEY || "").trim();
+      if (!rawKey) {
+        throw new Error("Missing VITE_GEMINI_API_KEY in environment or .env");
+      }
 
-      if (!apiKey) throw new Error("Missing VITE_GEMINI_API_KEY in .env");
+      const isBearerToken = rawKey.startsWith("AQ.");
+
+      // Formulate target endpoint and headers based on token type
+      const url = isBearerToken
+        ? `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent`
+        : `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${rawKey}`;
+
+      const headers = {
+        'Content-Type': 'application/json'
+      };
+
+      if (isBearerToken) {
+        headers['Authorization'] = `Bearer ${rawKey}`;
+      } else {
+        headers['x-goog-api-key'] = rawKey;
+      }
 
       const systemPrompt = `
 You are the Smart-Search Floor Manager AI for a 6-Floor campus building (Floors 1 to 6).
@@ -591,26 +609,19 @@ TASK:
 3. If floor is mentioned, prioritize that floor. Output structured bullet points.
 `;
 
-      const cleanKey = apiKey.trim();
-      const res = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${cleanKey}`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'x-goog-api-key': cleanKey
-          },
-          body: JSON.stringify({
-            contents: [
-              {
-                parts: [
-                  { text: `${systemPrompt}\n\nQuery: "${query}"` }
-                ]
-              }
-            ]
-          })
-        }
-      );
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: headers,
+        body: JSON.stringify({
+          contents: [
+            {
+              parts: [
+                { text: `${systemPrompt}\n\nQuery: "${query}"` }
+              ]
+            }
+          ]
+        })
+      });
 
       const data = await res.json();
       if (data.error) {
@@ -739,7 +750,7 @@ TASK:
           ))}
         </div>
 
-        {/* TAB 1: 3D MAP, COUNTDOWN & SQUAD SHARE */}
+        {/* TAB 1: 3D MAP, LIVE COUNTDOWN & SQUAD SHARE */}
         {activeTab === 'rooms' && (
           <div className="space-y-8 animate-[fadeIn_0.3s_ease-out]">
             {/* Global Day & Period Picker */}
@@ -1028,7 +1039,7 @@ TASK:
                         <strong className="text-slate-200">{room.assignedSection}</strong>
                       </div>
 
-                      {/* LIVE COUNTDOWN ON CARD (Phase 2 Feature) */}
+                      {/* LIVE COUNTDOWN ON CARD */}
                       <div className="text-xs mb-3 space-y-1">
                         {room.isFree ? (
                           <div>
@@ -1049,7 +1060,7 @@ TASK:
                     </div>
 
                     <div className="space-y-2 pt-3 border-t border-white/10">
-                      {/* CALL THE SQUAD BUTTON (Phase 2 Feature) */}
+                      {/* CALL THE SQUAD BUTTON */}
                       <button
                         type="button"
                         onClick={() => handleCallSquad(room)}
